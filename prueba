@@ -1,0 +1,82 @@
+git init
+const express = require('express');
+const app = express();
+const port = 3000;
+
+// Middleware para parsear el body de las peticiones POST
+app.use(express.urlencoded({ extended: true }));
+
+// Base de datos en memoria (simulada con una matriz)
+let users = [];
+
+// Ruta para manejar la solicitud POST del formulario
+app.post('/submit-tu-formulario-aqui', (req, res) => {
+    const nombre = req.body.nombre;
+    const email = req.body.email;
+
+    // Almacenar los datos del usuario en la "base de datos"
+    const newUser = { nombre, email };
+    users.push(newUser);
+
+    // Puedes imprimir la base de datos en la consola para verificar
+    console.log('Usuarios almacenados:', users);
+
+    // Enviar una respuesta de vuelta al cliente
+    // Aquí puedes enviar cualquier mensaje de éxito que desees
+    res.send('Datos recibidos y almacenados correctamente');
+});
+
+// Iniciar el servidor
+app.listen(port, () => {
+    console.log(`Servidor Express escuchando en http://localhost:${port}`);
+});
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario de Contacto</title>
+</head>
+<body>
+
+<h2>Formulario de Contacto</h2>
+
+<form id="formularioContacto" action="http://localhost:3000/submit-tu-formulario-aqui" method="post">
+    <label for="nombre">Nombre:</label>
+    <input type="text" id="nombre" name="nombre" required>
+
+    <label for="email">Correo electrónico:</label>
+    <input type="email" id="email" name="email" required>
+
+    <button type="submit">Enviar</button>
+</form>
+
+<div id="mensajeExito" style="display: none; color: green; margin-top: 10px;">
+    ¡Formulario enviado correctamente!
+</div>
+
+</body>
+</html>
+
+<script>
+document.getElementById('formularioContacto').addEventListener('submit', function(event) {
+    event.preventDefault();  // Evita que el formulario se envíe de manera predeterminada
+
+    // Realiza la solicitud POST utilizando Fetch API
+    fetch('http://localhost:3000/submit-tu-formulario-aqui', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams(new FormData(document.getElementById('formularioContacto')))
+    })
+    .then(response => {
+        if (response.ok) {
+            // Muestra el mensaje de éxito
+            document.getElementById('mensajeExito').style.display = 'block';
+            // Puedes hacer más acciones aquí si lo necesitas
+        }
+    })
+    .catch(error => console.error('Error al enviar el formulario:', error));
+});
+</script>
